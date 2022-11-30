@@ -48,7 +48,7 @@ class ToDoListController extends Controller
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return \App\Models\TodoList
      */
     public function update(TodoListRequest $request, TodoList $todo_list)
     {

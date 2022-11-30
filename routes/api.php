@@ -20,25 +20,28 @@ use App\Http\Controllers\Auth\RegistrationController;
 |
 */
 
-Route::middleware('auth:sanctum')->group(function(){
-    Route::apiResource('todo-list',ToDoListController::class);
-    
-    Route::apiResource('todo-list.task',TaskController::class)
+Route::middleware('auth:sanctum')->group(function () {
+    Route::apiResource('todo-list', ToDoListController::class);
+
+    Route::apiResource('todo-list.task', TaskController::class)
         ->except('show')
         ->shallow();
 
-    Route::apiResource('label',LabelController::class);
+    Route::apiResource('label', LabelController::class);
 
-    Route::get('/web-service/connect/{web_service}',[WebServiceController::class,'connect'])
+    // services routes 
+    Route::get('/web-service/connect/{web_service}', [WebServiceController::class, 'connect'])
         ->name('service.connect');
 
-    Route::post('/web-service/callback',[WebServiceController::class,'callback'])
+    Route::post('/web-service/callback', [WebServiceController::class, 'callback'])
         ->name('service.callback');
+
+    Route::post('/web-service/{web_service}', [WebServiceController::class, 'upload'])
+        ->name('service.upload');
 });
 
-Route::post('/register',RegistrationController::class)
+Route::post('/register', RegistrationController::class)
     ->name('user.register');
 
-Route::post('/login',LoginController::class)
+Route::post('/login', LoginController::class)
     ->name('user.login');
-

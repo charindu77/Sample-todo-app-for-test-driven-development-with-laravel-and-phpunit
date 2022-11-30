@@ -18,8 +18,8 @@ class LabelFactory extends Factory
     public function definition()
     {
         return [
-            'title'=> $this->faker->jobTitle,
-            'color'=> $this->faker->colorName,
+            'title'=> ucwords($this->faker->jobTitle),
+            'color'=> ucwords($this->faker->colorName),
             'user_id'=>function(){
                 return User::factory()->create()->id;
             }

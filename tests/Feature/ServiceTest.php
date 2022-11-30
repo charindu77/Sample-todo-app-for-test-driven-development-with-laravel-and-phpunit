@@ -32,6 +32,10 @@ class ServiceTest extends TestCase
 
         $response = $this->getJson(route('service.connect','google-drive'))
         ->assertOk()
+
+
+
+        
         ->json();
 
         $this->assertNotEmpty($response['url']);
@@ -42,7 +46,7 @@ class ServiceTest extends TestCase
     {
         $this->mock(Client::class, function (MockInterface $mock) {
             $mock->shouldReceive('fetchAccessTokenWithAuthCode')
-                ->andReturn('fake-token');
+                ->andReturn(['access-token'=>'fake-token']);
         });
 
         $this->postJson(route('service.callback'),['code'=>'dummy-code'])
@@ -53,8 +57,31 @@ class ServiceTest extends TestCase
         $this->assertDatabaseHas('web_services',
         [
             'user_id'=> $this->user->id,
-            'token'=>'{"access-token":"fake-token"}'
+            'token'=>json_encode(['access-token'=>'fake-token'])
         ]);
-        // $this->assertNotNull($this->user->services->first()->token);
+    }
+
+    public function test_user_can_upload_last_week_backup_to_drive()
+    {
+        $this->createTaskFactory(['created_at'=> now()->subDays(1)]);
+        $this->createTaskFactory(['created_at'=> now()->subDays(2)]);
+        $this->createTaskFactory(['created_at'=> now()->subDays(4)]);
+        $this->createTaskFactory(['created_at'=> now()->subDays(6)]);
+        $this->createTaskFactory(['created_at'=> now()->subDays(7)]);
+        $this->createTaskFactory(['created_at'=> now()->subDays(8)]);
+
+        $web_service=$this->createWebService(['name'=>'google-drive']);
+        
+        $this->mock(Client::class, function (MockInterface $mock) {
+            $mock->shouldReceive('setAccessToken');
+            $mock->shouldReceive('getLogger->info');
+            $mock->shouldReceive('shouldDefer');
+            $mock->shouldReceive('execute');
+        });
+        $this->postJson(route('service.upload',$web_service->id))
+            ->assertCreated();
     }
 }
+
+
+

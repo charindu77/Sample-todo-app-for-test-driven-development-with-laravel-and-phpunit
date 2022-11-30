@@ -1,7 +1,6 @@
 <?php
 
 use Google\Client;
-use Google\Service\Drive;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -17,6 +16,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('welcome');
+
 });
 
 Route::get('/google-drive',function(){
@@ -35,14 +35,14 @@ Route::get('/google-drive',function(){
 
 Route::get('/google-drive/callback',function(){
     $code=request('code');
+    var_dump(request('code'));
+    // $client=new Client();
+    // $client->setClientId('870034276614-1k83rna7a2clbm6n9jg86evo9ulsuvcj.apps.googleusercontent.com');
+    // $client->setClientSecret('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');
+    // $client->setRedirectUri('http://127.0.0.1:8000/google-drive/callback');
 
-    $client=new Client();
-    $client->setClientId('870034276614-1k83rna7a2clbm6n9jg86evo9ulsuvcj.apps.googleusercontent.com');
-    $client->setClientSecret('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');
-    $client->setRedirectUri('http://127.0.0.1:8000/google-drive/callback');
-
-    $token=$client->fetchAccessTokenWithAuthCode($code);
-    return $token;
+    // $token=$client->fetchAccessTokenWithAuthCode($code);
+    // return $token;
 });
 
 
@@ -55,7 +55,7 @@ Route::get('/upload',function(){
     $client->setRedirectUri('http://127.0.0.1:8000/google-drive/callback');
     $client->setAccessToken($accessToken);
 
-    $service= new Drive($client);
+    $service= new \Google\Service\Drive($client);
     $file = new Google\Service\Drive\DriveFile();
 
     // We'll setup an empty 1MB file to upload.

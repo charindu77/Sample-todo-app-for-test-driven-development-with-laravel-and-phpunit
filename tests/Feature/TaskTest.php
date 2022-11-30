@@ -32,8 +32,8 @@ class TaskTest extends TestCase
             ->json();
 
         $this->assertEquals(1,count($response));
-        $this->assertEquals($task->name,$response[0]['name']);
-        $this->assertEquals($this->list->id,$response[0]['todo_list_id']);
+        $this->assertEquals($task->name,$response['data'][0]['name']);
+        $this->assertEquals($this->list->title,$response['data'][0]['todo_list_title']);
     }
 
     public function test_store_task_for_a_todo_list()
@@ -43,7 +43,7 @@ class TaskTest extends TestCase
             ->assertCreated();
 
         $this->assertDatabaseHas('tasks',['name'=>$task->name,'todo_list_id'=>$this->list->id]);
-        $this->assertEquals($task->name,$response['name']);
+        $this->assertEquals($task->name,$response['data']['name']);
     }
 
     
@@ -87,7 +87,7 @@ class TaskTest extends TestCase
         $respond=$this->patchJson(route('task.update',$task->id),['name'=>$task->name,'status'=>Task::OPEN])
             ->assertOk();
 
-        $this->assertEquals(Task::OPEN,$respond['status']);         
+        $this->assertEquals(Task::OPEN,$respond['data']['status']);         
     }
 
     public function test_delete_all_tasks_related_to_a_todo_when_deleting_parent_todo()
@@ -115,6 +115,6 @@ class TaskTest extends TestCase
             ->assertCreated();
 
         $this->assertDatabaseHas('tasks',['label_id'=>$label->id,'todo_list_id'=>$this->list->id]);
-        $this->assertEquals($task->name,$response['name']);
+        $this->assertEquals($task->name,$response['data']['name']);
     }
 }  

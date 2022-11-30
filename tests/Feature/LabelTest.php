@@ -4,10 +4,6 @@ namespace Tests\Feature;
 
 use App\Models\Label;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
-use Illuminate\Support\Traits\ReflectsClosures;
-use Psy\Util\Json;
-use Symfony\Component\Routing\Route;
 use Tests\TestCase;
 
 class LabelTest extends TestCase
@@ -25,9 +21,8 @@ private $user;
     {
         $label=Label::factory()->raw();
 
-        $this->postJson(route('label.store'), $label)
+        $res=$this->postJson(route('label.store'), $label)
         ->assertCreated();
-
         $this->assertDatabaseHas('labels',['title'=>$label['title'],'color'=>$label['color']]);
     }
 
@@ -37,7 +32,7 @@ private $user;
         ->assertOk()
         ->Json();
 
-        $this->assertEquals('new color',$response['color']);
+        $this->assertEquals('New Color',$response['color']);
 
     }
 

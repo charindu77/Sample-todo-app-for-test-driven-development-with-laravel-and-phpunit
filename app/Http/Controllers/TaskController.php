@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\TaskResource;
 use App\Models\Task;
 use App\Http\Requests\TaskRequest;
 use App\Models\TodoList;
@@ -13,23 +14,24 @@ class TaskController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return \App\Http\Resources\TaskResource
      */
     public function index(TodoList $todo_list)
     {
         $task=$todo_list->tasks;
-        return response($task);
+        return TaskResource::collection($task);
     }
 
     /**
      * Store a newly created resource in storage.
      *
      * @param  \App\Http\Requests\TaskRequest  $request
-     * @return \Illuminate\Http\Response
+     * @return \App\Http\Resources\TaskResource
      */
     public function store(TaskRequest $request, TodoList $todo_list)
-    {
-        Return $todo_list->tasks()->create($request->validated());
+    {        
+        $task= $todo_list->tasks()->create($request->validated());
+        return new TaskResource($task);
     }
 
     /**
@@ -37,12 +39,12 @@ class TaskController extends Controller
      *
      * @param  \App\Http\Requests\TaskRequest  $request
      * @param  \App\Models\Task  $task
-     * @return \Illuminate\Http\Response
+     * @return \App\Http\Resources\TaskResource
      */
     public function update(TaskRequest $request, Task $task)
     {
         $task->update($request->validated());
-        return response($task);
+        return new TaskResource($task);
     }
 
     /**
