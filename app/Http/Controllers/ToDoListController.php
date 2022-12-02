@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\TodoListRequest;
 use App\Models\TodoList;
 use Illuminate\Http\Request;
+use App\Http\Resources\TodoResource;
+use App\Http\Requests\TodoListRequest;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Service\Attribute\Required;
 
@@ -13,34 +14,34 @@ class ToDoListController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
      */
     public function index()
     {
         $todo_list=auth()->user()->todoLists;
-        return response($todo_list);
+        return TodoResource::collection($todo_list);
     }
 
     /**
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @return \App\Http\Resources\TodoResource
      */
     public function store(TodoListRequest $request)
     {
-        return auth()->user()->todoLists()->create($request->validated());
+        return new TodoResource(auth()->user()->todoLists()->create($request->validated()));
     }
 
     /**
      * Display the specified resource.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return \App\Http\Resources\TodoResource
      */
     public function show(TodoList $todo_list)
     {
-        return response($todo_list);
+        return new TodoResource($todo_list);
     }
 
     /**
@@ -48,12 +49,12 @@ class ToDoListController extends Controller
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  int  $id
-     * @return \App\Models\TodoList
+     * @return \App\Http\Resources\TodoResource
      */
     public function update(TodoListRequest $request, TodoList $todo_list)
     {
         $todo_list->update($request->all());
-        return $todo_list;
+        return new TodoResource($todo_list);
     }
 
     /**

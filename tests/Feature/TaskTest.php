@@ -15,25 +15,28 @@ class TaskTest extends TestCase
     private $task;
     private $list;
 
+    private $label;
+
     public function setUp():void
     {
         parent::setUp();
         $this->userAuth();
-        $this->list=$this->createFactory(['title'=>'my todo']);
-        $this->task=$this->createTaskFactory();
+        $this->list=$this->createFactory(['title'=>'my todo','user_id'=> auth()->id()]);
+        $this->label=$this->createLabel(['user_id'=> auth()->id()]);
+        $this->task=$this->createTaskFactory(['label_id'=>$this->label->id]);
     }
 
     public function test_fetch_all_tasks_for_a_todo_list()
     {               
-        $task=$this->createTaskFactory(['todo_list_id'=>$this->list->id]);
+        $task=$this->createTaskFactory(['todo_list_id'=>$this->list->id,'label_id'=>$this->label->id]);
 
-        $response=$this->getJson(route('todo-list.task.index',$this->list->id))
+        $response=$this->getJson(route('todo-list.task.index',$this->list->id,))
             ->assertOk()
-            ->json();
-
+            ->json('data');
+            
         $this->assertEquals(1,count($response));
-        $this->assertEquals($task->name,$response['data'][0]['name']);
-        $this->assertEquals($this->list->title,$response['data'][0]['todo_list_title']);
+        $this->assertEquals($task->name,$response[0]['name']);
+        $this->assertEquals($this->list->title,$response[0]['todo_list']['title']);
     }
 
     public function test_store_task_for_a_todo_list()
@@ -85,9 +88,10 @@ class TaskTest extends TestCase
         $task=$this->createTaskFactory();
 
         $respond=$this->patchJson(route('task.update',$task->id),['name'=>$task->name,'status'=>Task::OPEN])
-            ->assertOk();
+            ->assertOk()
+            ->json('data');
 
-        $this->assertEquals(Task::OPEN,$respond['data']['status']);         
+        $this->assertEquals(Task::OPEN,$respond['status']);         
     }
 
     public function test_delete_all_tasks_related_to_a_todo_when_deleting_parent_todo()
@@ -112,9 +116,10 @@ class TaskTest extends TestCase
                 'name'=>$task->name,
                 'label_id'=>$label->id
             ])
-            ->assertCreated();
+            ->assertCreated()
+            ->json('data');
 
         $this->assertDatabaseHas('tasks',['label_id'=>$label->id,'todo_list_id'=>$this->list->id]);
-        $this->assertEquals($task->name,$response['data']['name']);
+        $this->assertEquals($task->name,$response['name']);
     }
 }  

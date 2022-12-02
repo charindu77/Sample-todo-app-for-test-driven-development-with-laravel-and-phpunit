@@ -4,32 +4,33 @@ namespace App\Http\Controllers;
 
 use App\Models\Label;
 use App\Http\Requests\LabelRequest;
-use SebastianBergmann\CodeCoverage\ReportAlreadyFinalizedException;
+use App\Http\Resources\LabelResource;
 use Symfony\Component\HttpFoundation\Response;
+use SebastianBergmann\CodeCoverage\ReportAlreadyFinalizedException;
 
 class LabelController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
      */
     public function index()
     {
-        return auth()->user()->labels;
+        return LabelResource::collection(auth()->user()->labels);
     }
 
     /**
      * Store a newly created resource in storage.
      *
      * @param  \App\Http\Requests\LabelRequest  $request
-     * @return \Illuminate\Http\Response
+     * @return \App\Http\Resources\LabelResource
      */
     public function store(LabelRequest $request)
     {
-        return auth()->user()
+        return new LabelResource(auth()->user()
             ->labels()
-            ->create($request->validated());
+            ->create($request->validated()));
     }
 
     /**
@@ -37,12 +38,12 @@ class LabelController extends Controller
      *
      * @param  \App\Http\Requests\LabelRequest  $request
      * @param  \App\Models\Label  $label
-     * @return \Illuminate\Http\Response
+     * @return \App\Http\Resources\LabelResource
      */
     public function update(LabelRequest $request, Label $label)
     {
         $label->update($request->validated());
-        return response($label);
+        return new LabelResource($label);
     }
 
     /**

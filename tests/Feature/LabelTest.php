@@ -20,7 +20,6 @@ private $user;
     public function test_user_can_create_a_label()
     {
         $label=Label::factory()->raw();
-
         $res=$this->postJson(route('label.store'), $label)
         ->assertCreated();
         $this->assertDatabaseHas('labels',['title'=>$label['title'],'color'=>$label['color']]);
@@ -30,7 +29,7 @@ private $user;
     {
         $response=$this->patchJson(route('label.update',$this->label->id),['title'=>$this->label->title,'color'=>'new color'])
         ->assertOk()
-        ->Json();
+        ->Json('data');
 
         $this->assertEquals('New Color',$response['color']);
 
@@ -50,7 +49,7 @@ private $user;
 
         $response=$this->getJson(route('label.index',$this->user->id))
             ->assertOk()
-            ->json();
+            ->json('data');
 
         $this->assertEquals(1,count($response));
         $this->assertEquals($response[0]['title'],$this->label->title);
